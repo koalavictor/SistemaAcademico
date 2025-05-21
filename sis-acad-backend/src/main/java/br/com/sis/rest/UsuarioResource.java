@@ -2,11 +2,12 @@ package br.com.sis.rest;
 
 import java.util.List;
 
-import br.com.sis.dto.UsuarioRequest;
-import br.com.sis.dto.UsuarioResponse;
+import br.com.sis.dto.LoginDTO;
+import br.com.sis.dto.TokenResponseDto;
+import br.com.sis.entity.Usuario;
+import br.com.sis.service.AuthService;
 import br.com.sis.service.UsuarioService;
 import jakarta.inject.Inject;
-import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -24,41 +25,54 @@ import jakarta.ws.rs.core.Response;
 public class UsuarioResource {
 
     @Inject
-    UsuarioService service;
+    UsuarioService usuarioService;
 
-    @GET
-    public List<UsuarioResponse> listar() {
-        return service.listAll();
+    @Inject
+    AuthService authService;
+
+    @POST
+    @Path("/login")
+    public Response login(LoginDTO login) {
+        try {
+            String token = authService.login(login);
+            return Response.ok(new TokenResponseDto(token)).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        }
     }
 
     @GET
-    @Path("/{id}")
-    public Response buscar(@PathParam("id") String id) {
-        return service.findById(id)
-                .map(usuario -> Response.ok(usuario).build())
-                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    public List<Usuario> listarTodos() {
+        return usuarioService.listarTodos();
+    }
+
+    @GET
+    @Path("/{email}")
+    public Response buscarPorId(@PathParam("id") String email) {
+        Usuario response = usuarioService.buscarPorEmail(email);
+        return Response.status(Response.Status.OK).entity(response).build();
     }
 
     @POST
-    public Response criar(@Valid UsuarioRequest request) {
-        UsuarioResponse usuario = service.create(request);
-        return Response.status(Response.Status.CREATED).entity(usuario).build();
+    public Response criar(Usuario usuario) {
+        usuarioService.cadastrar(usuario);
+
+        return Response.status(Response.Status.OK).build();
     }
 
     @PUT
     @Path("/{id}")
-    public Response atualizar(@PathParam("id") String id, @Valid UsuarioRequest request) {
-        return service.update(id, request)
-                .map(usuario -> Response.ok(usuario).build())
-                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    public Usuario atualizar(@PathParam("id") String email, Usuario usuario) {
+        return usuarioService.atualizar(email, usuario);
     }
 
     @DELETE
     @Path("/{id}")
-    public Response deletar(@PathParam("id") String id) {
-        if (service.delete(id)) {
+    public Response deletar(@PathParam("id") String email) {
+        if (usuarioService.deletar(email)) {
             return Response.noContent().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.NOT_FOUND).build();
     }
 }
