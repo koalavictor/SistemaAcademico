@@ -1,0 +1,10 @@
+br\com\sis\util\JwtUtil.class
+br\com\sis\service\AuthService.class
+br\com\sis\enums\TipoUsuarioEnum.class
+br\com\sis\repository\UsuarioRepository.class
+br\com\sis\rest\UsuarioResource.class
+br\com\sis\dto\LoginDTO.class
+br\com\sis\service\UsuarioService.class
+META-INF\panache-archive.marker
+br\com\sis\dto\TokenResponseDto.class
+br\com\sis\entity\Usuario.class
