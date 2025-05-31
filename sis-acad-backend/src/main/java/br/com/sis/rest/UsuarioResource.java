@@ -48,7 +48,7 @@ public class UsuarioResource {
 
     @GET
     @Path("/{email}")
-    public Response buscarPorId(@PathParam("id") String email) {
+    public Response buscarPorId(@PathParam("email") String email) {
         Usuario response = usuarioService.buscarPorEmail(email);
         return Response.status(Response.Status.OK).entity(response).build();
     }
@@ -58,6 +58,7 @@ public class UsuarioResource {
         usuarioService.cadastrar(usuario);
 
         return Response.status(Response.Status.OK).build();
+        
     }
 
     @PUT
@@ -67,8 +68,8 @@ public class UsuarioResource {
     }
 
     @DELETE
-    @Path("/{id}")
-    public Response deletar(@PathParam("id") String email) {
+    @Path("/{email}")
+    public Response deletar(@PathParam("email") String email) {
         if (usuarioService.deletar(email)) {
             return Response.noContent().build();
         } else {
